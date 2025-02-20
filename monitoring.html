@@ -55,6 +55,9 @@
         }
     </style>
     <script>
+        // URL Google Apps Script API
+        const scriptURL = "https://script.google.com/macros/s/AKfycbya6kzwMbRjg432wHo8LV4SdKpSC-CYEepTS5267chifdQWAsnzUVtdSHOX1aL-WzYG1w/exec";
+
         function loadRatings() {
             let ratings = JSON.parse(localStorage.getItem('ratings')) || [];
             let tableBody = document.getElementById('ratingsTableBody');
@@ -107,16 +110,43 @@
             document.getElementById('veryBadCount').innerText = counts['Очень плохо'];
         }
 
-        function exportCSV() {
+        function exportXLSX() {
             let ratings = JSON.parse(localStorage.getItem('ratings')) || [];
-            let csvContent = "data:text/csv;charset=utf-8,Оценка,Дата и время\n" +
-                ratings.map(e => `${e.rating},${new Date(e.timestamp).toLocaleString()}`).join("\n");
-            let encodedUri = encodeURI(csvContent);
-            let link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "ratings_report.csv");
-            document.body.appendChild(link);
-            link.click();
+            let data = [["Оценка", "Дата и время"]];
+            
+            ratings.forEach(e => {
+                data.push([e.rating, new Date(e.timestamp).toLocaleString()]);
+            });
+
+            let ws = XLSX.utils.aoa_to_sheet(data);
+            let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Оценки");
+
+            XLSX.writeFile(wb, "ratings_report.xlsx");
+        }
+
+        function exportOnline() {
+            let ratings = JSON.parse(localStorage.getItem('ratings')) || [];
+
+            if (ratings.length === 0) {
+                alert("Нет данных для выгрузки!");
+                return;
+            }
+
+            fetch(scriptURL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(ratings)
+            })
+            .then(response => response.text())
+            .then(data => {
+                alert("Данные успешно выгружены в Google Таблицу!");
+                console.log("Ответ сервера:", data);
+            })
+            .catch(error => {
+                alert("Ошибка при выгрузке данных!");
+                console.error("Ошибка:", error);
+            });
         }
 
         function clearRatings() {
@@ -124,6 +154,7 @@
             loadRatings();
         }
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body onload="loadRatings()">
     <h1>Мониторинг оценок</h1>
@@ -138,7 +169,8 @@
         <input type="date" id="dateFilter" onchange="filterRatings()">
         <button onclick="loadRatings()">Сбросить</button>
         <button onclick="clearRatings()">Очистить оценки</button>
-        <button onclick="exportCSV()">Экспорт в CSV</button>
+        <button onclick="exportXLSX()">Экспорт в Excel</button>
+        <button onclick="exportOnline()">Выгрузка онлайн</button>
     </div>
     <table>
         <thead>
