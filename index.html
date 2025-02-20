@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оценка качества питания</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(to right, #ff9966, #ff5e62);
+            color: white;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        button {
+            font-size: 18px;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            color: white;
+        }
+        .excellent { background: green; }
+        .good { background: #4CAF50; }
+        .neutral { background: orange; }
+        .bad { background: red; }
+        .terrible { background: darkred; }
+    </style>
+</head>
+<body>
+
+    <h1>Оцените качество нашего сервиса</h1>
+
+    <div class="buttons">
+        <button class="excellent" onclick="sendRating('Отлично')">😃 Отлично</button>
+        <button class="good" onclick="sendRating('Хорошо')">😊 Хорошо</button>
+        <button class="neutral" onclick="sendRating('Нормально')">😐 Нормально</button>
+        <button class="bad" onclick="sendRating('Плохо')">☹️ Плохо</button>
+        <button class="terrible" onclick="sendRating('Ужасно')">😡 Ужасно</button>
+    </div>
+
+    <p id="status"></p>
+
+    <script>
+        function sendRating(rating) {
+            const scriptURL = "https://script.google.com/macros/s/AKfycbzMdpyqVIdE237T8IdNoFGOzKOqfbEm5iAwwS1Uttz2WfgINTnXH3oPp2Vnzejrk-1L/exec"; // Укажите ваш Google Apps Script URL
+
+            const data = {
+                rating: rating,
+                timestamp: new Date().toISOString()
+            };
+
+            fetch(scriptURL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            }).then(() => {
+                document.getElementById("status").innerText = "Спасибо за ваш отзыв!";
+            }).catch(() => {
+                document.getElementById("status").innerText = "Ошибка отправки оценки!";
+            });
+        }
+    </script>
+
+</body>
+</html>
