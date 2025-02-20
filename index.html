@@ -1,0 +1,77 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оценка сервиса</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            color: white;
+            padding: 50px;
+        }
+        h1 {
+            font-size: 32px;
+            margin-bottom: 30px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .rating-button {
+            font-size: 24px;
+            padding: 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.3s;
+            min-width: 150px;
+        }
+        .rating-button:hover {
+            transform: scale(1.1);
+        }
+        .rating-button:active {
+            transform: scale(0.9);
+        }
+        .excellent { background-color: #4CAF50; color: white; }
+        .good { background-color: #8BC34A; color: white; }
+        .normal { background-color: #FFC107; color: white; }
+        .bad { background-color: #FF5722; color: white; }
+        .very-bad { background-color: #F44336; color: white; }
+        #thank-you {
+            font-size: 20px;
+            margin-top: 20px;
+            opacity: 0;
+            transition: opacity 1s;
+        }
+    </style>
+    <script>
+        function submitRating(rating) {
+            let ratings = JSON.parse(localStorage.getItem('ratings')) || [];
+            ratings.push({ rating: rating, timestamp: new Date().toISOString() });
+            localStorage.setItem('ratings', JSON.stringify(ratings));
+            
+            let thankYouMessage = document.getElementById('thank-you');
+            thankYouMessage.style.opacity = 1;
+            setTimeout(() => {
+                thankYouMessage.style.opacity = 0;
+            }, 1000);
+        }
+    </script>
+</head>
+<body>
+    <h1>Оцените качество нашего сервиса</h1>
+    <div class="button-container">
+        <button class="rating-button excellent" onclick="submitRating('Отлично')">😊 Отлично</button>
+        <button class="rating-button good" onclick="submitRating('Хорошо')">🙂 Хорошо</button>
+        <button class="rating-button normal" onclick="submitRating('Нормально')">😐 Нормально</button>
+        <button class="rating-button bad" onclick="submitRating('Плохо')">☹️ Плохо</button>
+        <button class="rating-button very-bad" onclick="submitRating('Очень плохо')">😡 Очень плохо</button>
+    </div>
+    <div id="thank-you">Спасибо за оценку!</div>
+</body>
+</html>
